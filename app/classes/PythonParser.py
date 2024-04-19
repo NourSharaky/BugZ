@@ -7,13 +7,15 @@ import json,re
 
 # TODO: read from directory and identify all the python files and requements files
 
+# Graphical User interface
+# Probably flask-based web interface
+
 # LIBRARIES 
-# TODO: Insecure Full List
-# TODO: python file imports
+# TODO: GUI
 
 
 class PythonParser:
-    def __init__(self, targetFile, targetReqFile=None):
+    def __init__(self, targetFile, targetReqFile=None, logging=False):
         self.language = Language(tspython.language(), "python")
         self.targetFile = targetFile
         self.tragetReqFile = targetReqFile
@@ -22,10 +24,16 @@ class PythonParser:
         self.sourceCode = None
         self.tree = None
         self.vulnDBFileName = 'db\\insecure.json'
-        self.vulnDB = self.LoadVulnDB()
+        self.vulnDB = self.LoadDB(self.vulnDBFileName)
+        self.fullVulnDBFileName = 'db\\insecure_full.json'
+        self.fullVulnDB = self.LoadDB(self.fullVulnDBFileName)
+        self.logging = logging
 
-    def LoadVulnDB(self):
-        with open(self.vulnDBFileName, 'r') as json_file:
+        print(colored("Target Python File: ", "green") + targetFile)
+        print(colored("Target Requirements File: ", "green") + targetReqFile + "\n")
+
+    def LoadDB(self, DBName):
+        with open(DBName, 'r') as json_file:
             db = json.load(json_file)    
         return db
     
@@ -48,7 +56,9 @@ class PythonParser:
 
     def basicParse(self):
         queries = {
-            "Imports": "(import_from_statement) @importFromStatement",
+            "Imports": "(import_statement) @importStatement",
+            "Imports from": "(import_from_statement) @importFromStatement",
+            "Imports Functions": "(import_from_statement name: (dotted_name) @importFromFunctions)",
             "Class Definitions": "(class_definition) @classDefinition",
             "Function Definitions": "(function_definition) @functionDefinition",
             "Function Names": "(function_definition name: (identifier) @functionName)",
@@ -56,9 +66,42 @@ class PythonParser:
             "Strings": "(string) @string",
             "Comments": "(comment) @comment",
         }
+        return self.queryParse(queries)
+    
+    def advancedParse(self):
+        queries = {
+        "Imports": "(import_statement) @importStatement",
+        "Imports Names": "(import_statement (dotted_name) @importName)",
+        "Imports from": "(import_from_statement) @importFromStatement",
+        "Imports from Names": "(import_from_statement module_name: (dotted_name) @importFromName)",
+        "Imports Functions": "(import_from_statement name: (dotted_name) @importFromFunctions)",
+        "Class Definitions": "(class_definition) @classDefinition",
+        "Function Definitions": "(function_definition) @functionDefinition",
+        "Function Names": "(function_definition name: (identifier) @functionName)",
+        "Assignments": "(assignment) @assignment",
+        "Strings": "(string) @string",
+        "Comments": "(comment) @comment",
+        }
+        return self.queryParse(queries)
+    
+    def queryParse(self, queries):
+        parsedFile = {}
+
         for title, query in queries.items():
             captured = self.query(query)
-            self.printCaptured(title, captured)
+
+            if self.logging:
+                self.printCaptured(title, captured)
+
+            parsedFile[title] = []
+
+            # Grabb the text from the captured data
+            for i in captured:
+                parsedFile[title].append(i[0].text.decode("utf-8"))
+            
+
+
+        return parsedFile
 
     def requirementsParse(self, location):
         with open(location, "r") as file:
@@ -86,8 +129,9 @@ class PythonParser:
         vulnLibs = {}
         # Define a regular expression pattern to match the operator and the value
         pattern = r'(==|[<>]=?)([0-9a-zA-Z.]+)'
-        
-        print(colored("Vulnerable Libraries Detected:", "red"))
+
+        if self.logging:
+            print(colored("Vulnerable Libraries Detected:", "red"))
 
         requirements = self.requirementsParse(self.tragetReqFile)
         
@@ -107,7 +151,7 @@ class PythonParser:
                 for vulnVersionRange in vulnLibVersions:
                     vulnVersions = vulnVersionRange
                     conditions = vulnVersions.split(",")
-                    # print(RequiredLib,"-",ReqLibVersion,"-",conditions)
+                    
                     # check if the required version meets the conditions
                     for condition in conditions:
                         operator, version = re.match(pattern, condition).groups()
@@ -123,17 +167,62 @@ class PythonParser:
                         elif operator == "==" and ReqLibVersion == version:
                             is_vulnerable = True
                         else:
-                            is_vulnerable = False
-                                
+                            is_vulnerable = False                                
                 if is_vulnerable:
-                    vulnLibs[RequiredLib] = requirements[RequiredLib]
-                    print(RequiredLib, ReqLibVersion, "is vulnerable to attacks", conditions)
 
-        print(colored("Libraries Missing Version:", "red"))
-        print(LibsMissingVersion)
+                    vulnLibs[RequiredLib] = {"Current Version" : requirements[RequiredLib], "Vulnerable Range" : conditions} 
+                    
+                    if self.logging:
+                        print(RequiredLib, ReqLibVersion, "is vulnerable to attacks", conditions)
+        return vulnLibs, LibsMissingVersion
 
-        return vulnLibs 
-                        
+    def advancedCheckVulnLibs(self):
+        vulnLibs , _ = self.checkVulnLibs()
+        output = {}
+        # print(vulnLibs)
+        for vulnLibName in vulnLibs.keys():
+            if vulnLibName in self.fullVulnDB.keys():
+                vulnerableRange = vulnLibs[vulnLibName]["Vulnerable Range"]
+                vulnerableRange = ','.join(vulnerableRange)
+
+                for i in range(len(self.fullVulnDB[vulnLibName])):
+                    if vulnerableRange == self.fullVulnDB[vulnLibName][i]["v"]:
+                    
+                       self.fullVulnDB[vulnLibName][i]["Current Version"] = vulnLibs[vulnLibName]["Current Version"]
+                       output[vulnLibName] = self.fullVulnDB[vulnLibName][i]
+        return output              
+                    
+    def checkVulnImports(self):
+        query = {
+            "Imports Names": "(import_statement (dotted_name) @importName)",
+            "Imports from Names": "(import_from_statement module_name: (dotted_name) @importFromName)"
+            }
+        queryOutput = self.queryParse(query)
+
+        imports = queryOutput["Imports Names"] + queryOutput["Imports from Names"]
+
+        vulnLibs = {}
+
+        for importedLib in imports:
+            importedLib = importedLib.split(".")[0]
+
+            if importedLib in self.vulnDB:
+                # store name and versions in vulndb
+                versions = self.vulnDB[importedLib]
+                vulnLibs[importedLib] = versions
+
+        return vulnLibs
+
+ 
+                
+            
+                
+
+
+
+        
+
+
         
                 
 
