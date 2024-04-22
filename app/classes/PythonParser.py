@@ -3,9 +3,9 @@ import tree_sitter_python as tspython
 from tree_sitter import Language, Parser
 from pprint import pprint
 from termcolor import colored
-import json,re
+import json,re,os
 
-# TODO: read from directory and identify all the python files and requements files
+# TODO: read from folder and identify all the python files and requirements files
 
 # Graphical User interface
 # Probably flask-based web interface
@@ -15,10 +15,10 @@ import json,re
 
 
 class PythonParser:
-    def __init__(self, targetFile, targetReqFile=None, logging=False):
+    def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None):
         self.language = Language(tspython.language(), "python")
         self.targetFile = targetFile
-        self.tragetReqFile = targetReqFile
+        self.targetReqFile = targetReqFile
         self.parser = Parser()
         self.parser.set_language(self.language)
         self.sourceCode = None
@@ -28,9 +28,36 @@ class PythonParser:
         self.fullVulnDBFileName = 'db\\insecure_full.json'
         self.fullVulnDB = self.LoadDB(self.fullVulnDBFileName)
         self.logging = logging
+        self.projectFolder = projectFolder
 
-        print(colored("Target Python File: ", "green") + targetFile)
-        print(colored("Target Requirements File: ", "green") + targetReqFile + "\n")
+        
+
+    def scanDirectory(self):
+        if self.logging:
+            print(colored("Target Project Directory: ", "green") + self.projectFolder + "\n----------------------")
+        pythonFiles = []
+
+        ignore_dirs = ['Lib']
+        
+        # Walking through the directory and its subdirectories
+        for root, dirs, files in os.walk(self.projectFolder):
+            dirs[:] = [d for d in dirs if d not in ignore_dirs]
+
+            for file in files:
+                if file.endswith('.py'):
+                    pythonFiles.append(os.path.join(root, file))
+                elif file == 'requirements.txt':
+                    requirementsFile= os.path.join(root, file)
+
+        self.targetReqFile = requirementsFile
+        
+        if self.logging:
+            print(colored("Target Requirements File: ", "green") + self.targetReqFile)
+            print(colored("Target Python Files: ", "green"))
+            pprint(pythonFiles)
+            print("\n----------------------")
+
+        return pythonFiles, requirementsFile
 
     def LoadDB(self, DBName):
         with open(DBName, 'r') as json_file:
@@ -134,7 +161,7 @@ class PythonParser:
         if self.logging:
             print(colored("Vulnerable Libraries Detected:", "red"))
 
-        requirements = self.requirementsParse(self.tragetReqFile)
+        requirements = self.requirementsParse(self.targetReqFile)
         
         LibsMissingVersion = []
 
@@ -205,7 +232,7 @@ class PythonParser:
 
         vulnLibs = {}
 
-        requirements = self.requirementsParse(self.tragetReqFile)
+        requirements = self.requirementsParse(self.targetReqFile)
         # requirements keys to lower
         requirements = [req.lower() for req in requirements.keys()]
 
@@ -220,6 +247,18 @@ class PythonParser:
 
         return vulnLibs
 
+    def scanPythonFiles(self):
+        pythonFiles , _= self.scanDirectory()
+
+        output = {}
+
+        for pythonFile in pythonFiles:
+            self.targetFile = pythonFile
+            self.parseFile()
+            vulnerableImports = self.checkVulnImports()
+            output[pythonFile] = {"Vulnerable Imports" : vulnerableImports}
+
+        return output
 
 
  
