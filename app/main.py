@@ -24,13 +24,13 @@ if __name__ == "__main__":
     # print(colored("Libraries Missing Version: ", "yellow"))
     # pprint(LibsMissingVersion)
 
-    # print(colored("Vulnerable Imports: ", "red"))
-    # vulnImports = parser.checkVulnImports()
-    # pprint(vulnImports)
+    print(colored("Vulnerable Imports: ", "red"))
+    vulnImports = parser.checkVulnImports()
+    pprint(vulnImports)
 
     # print(colored("Advanced Vulnerable Libraries: ", "red"))
-    advancedVulnLibs =  parser.advancedCheckVulnLibs()
-    pprint(advancedVulnLibs)
+    # advancedVulnLibs =  parser.advancedCheckVulnLibs()
+    # pprint(advancedVulnLibs)
 
     
 

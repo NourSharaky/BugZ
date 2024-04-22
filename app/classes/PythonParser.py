@@ -34,7 +34,8 @@ class PythonParser:
 
     def LoadDB(self, DBName):
         with open(DBName, 'r') as json_file:
-            db = json.load(json_file)    
+            db = json.load(json_file) 
+
         return db
     
     def parseFile(self):
@@ -193,6 +194,7 @@ class PythonParser:
         return output              
                     
     def checkVulnImports(self):
+        # checks if an imported library is not in requirements.txt and is vulnerable
         query = {
             "Imports Names": "(import_statement (dotted_name) @importName)",
             "Imports from Names": "(import_from_statement module_name: (dotted_name) @importFromName)"
@@ -203,15 +205,22 @@ class PythonParser:
 
         vulnLibs = {}
 
-        for importedLib in imports:
-            importedLib = importedLib.split(".")[0]
+        requirements = self.requirementsParse(self.tragetReqFile)
+        # requirements keys to lower
+        requirements = [req.lower() for req in requirements.keys()]
 
-            if importedLib in self.vulnDB:
-                # store name and versions in vulndb
-                versions = self.vulnDB[importedLib]
-                vulnLibs[importedLib] = versions
+        for importedLib in imports:
+            importedLib = importedLib.split(".")[0].lower()
+            
+            if not (importedLib in requirements):
+                if importedLib in self.vulnDB:
+                    # store name and versions in vulndb
+                    versions = self.vulnDB[importedLib]
+                    vulnLibs[importedLib] = versions
 
         return vulnLibs
+
+
 
  
                 

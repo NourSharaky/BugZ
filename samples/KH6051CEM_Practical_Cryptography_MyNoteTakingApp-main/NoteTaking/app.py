@@ -19,6 +19,8 @@ from AES import AESCipher
 import os
 from base64 import b64encode, b64decode
 import re
+import wheel
+import whispers
 
 # -----------------------------------------------------------------
 
