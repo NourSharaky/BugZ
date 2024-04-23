@@ -5,14 +5,11 @@ from pprint import pprint
 from termcolor import colored
 import json,re,os
 
-# TODO: read from folder and identify all the python files and requirements files
-
 # Graphical User interface
 # Probably flask-based web interface
 
 # LIBRARIES 
 # TODO: GUI
-
 
 class PythonParser:
     def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None):
@@ -48,8 +45,7 @@ class PythonParser:
                     pythonFiles.append(os.path.join(root, file))
                 elif file == 'requirements.txt':
                     requirementsFile= os.path.join(root, file)
-
-        self.targetReqFile = requirementsFile
+                    self.targetReqFile = requirementsFile
         
         if self.logging:
             print(colored("Target Requirements File: ", "green") + self.targetReqFile)
