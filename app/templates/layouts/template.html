@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowbite Flask</title>
+    <title>BugZ</title>
+    <link rel="shortcut icon" type="image/png" href="static/images/logoGraphic.png" />
     <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/styles.css')}}">
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         document.onload = function () {
@@ -27,7 +29,9 @@
     {% block scripts %}
         <script src="static/js/darkMode.js"></script>
         <script src="static/js/actions.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+        <script src="static/js/flowbite.min.js"></script>
+        <script src="static/js/JQuery.min.js"></script>
+
     {% endblock %}
 </body>
 

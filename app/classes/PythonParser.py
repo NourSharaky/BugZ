@@ -36,6 +36,8 @@ class PythonParser:
 
         ignore_dirs = ['Lib']
         
+        requirementsFile = None
+        
         # Walking through the directory and its subdirectories
         for root, dirs, files in os.walk(self.projectFolder):
             dirs[:] = [d for d in dirs if d not in ignore_dirs]
@@ -52,6 +54,7 @@ class PythonParser:
             print(colored("Target Python Files: ", "green"))
             pprint(pythonFiles)
             print("\n----------------------")
+
 
         return pythonFiles, requirementsFile
 

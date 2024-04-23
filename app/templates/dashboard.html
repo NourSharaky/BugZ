@@ -1,7 +1,19 @@
 {% extends 'layouts/template.html' %}
 
 {% block content %}
-{{projectName}}
-{{requirementsFile}}
+<h1 class="h1">Project Title: <span style="font-weight:normal;">{{projectName}}</span></h1>
+<hr><br>
+
+<h2 class="h2">Vulnerability Summary:</h2>
+
+{% include 'components/severityCards.html'%}
+
+<hr><br>
+<!-- to be replaced -->
+{% include 'components/vulnerabilityTable.html'%}
+
+<!-- use tabulator instead -->
+
+
 
 {% endblock %}

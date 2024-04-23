@@ -13,16 +13,12 @@ app.secret_key = 'super secret'  # Set a secret key for the session
 
 @app.route('/')
 def index():
-    # files = ['requirements.txt', 'app.py', 'aes.py']
 
-
-    return render_template('index.html') #, files = files)
+    return render_template('index.html') 
 
 @app.post('/getTargetFolder')
 def getTargetFolder():
     global parser
-
-    print("Getting Target Folder")
 
     result = subprocess.run(['python', 'selectDirectory.py'], capture_output=True, text=True)
     if result.stdout:
@@ -43,23 +39,51 @@ def dashboard():
     if request.method == 'GET':
         # Retrieve data from session or use default values
         projectName = session.get('projectName', 'Default Project Name')
+        projectPath = session.get('projectPath', None)
         pythonFiles = session.get('pythonFiles', [])
         requirementsFile = session.get('requirementsFile', "")
-        return render_template('dashboard.html', projectName=projectName, pythonFiles=pythonFiles, requirementsFile=requirementsFile)
+
+        files = []
+        for file in pythonFiles:
+            file = str(file).split(projectPath)[-1]
+            files.append(file)
+
+        if requirementsFile != None and requirementsFile != "":
+            requirementsFile = str(requirementsFile).split(projectPath)[-1]
+        
+        return render_template('dashboard.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
     else:
         # POST request: update session data
         projectName = request.form['projectName']
         projectPath = request.form['projectPath']
         
         session['projectName'] = projectName  # Store projectName in session
+        session['projectPath'] = projectPath
         parser.projectFolder = projectPath
         
         pythonFiles, requirementsFile = parser.scanDirectory()
-        print(requirementsFile)
+
         # Store these in the session as well
         session['pythonFiles'] = pythonFiles
         session['requirementsFile'] = requirementsFile
 
         return redirect(url_for('dashboard'))
+
+@app.route("/api/severitySummary")
+def severitySummary():
+    global parser
+    if parser is None:
+        abort(404)
+
+# TODO: Implement the severity summary
+    severitySummary = {
+        "critical": 1,
+        "high": 10,
+        "medium": 20,
+        "low": 2,
+        "info": 0
+    }
+    return jsonify(severitySummary)
+
 if __name__ == '__main__':
     app.run(debug=True)

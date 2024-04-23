@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # requirementsFile = "..\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main\\requirements.txt"
 
     projectFolder = "D:\\TKH\\BugZ\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main"
-    parser = PythonParser(logging=False, projectFolder=projectFolder)
+    parser = PythonParser(logging=True, projectFolder=projectFolder)
     # parser.parseFile()
     # parser.basicParse()
 
