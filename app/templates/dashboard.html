@@ -8,11 +8,14 @@
 
 {% include 'components/severityCards.html'%}
 
-<hr><br>
-<!-- to be replaced -->
-{% include 'components/vulnerabilityTable.html'%}
+<div class="vulnSummaryDiagrams">
 
-<!-- use tabulator instead -->
+    {% include 'components/vulnerabilityTable.html'%}
+    
+    {% include 'components/pieChart.html'%}
+</div>
+
+
 
 
 

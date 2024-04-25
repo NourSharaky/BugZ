@@ -85,5 +85,33 @@ def severitySummary():
     }
     return jsonify(severitySummary)
 
+@app.route("/api/vulnerabilitySummary")
+def vulnTable():
+    global parser
+    if parser is None:
+        abort(404)
+
+# TODO: Implement the severity summary
+    vulnTable = [
+        {"id": 1, "severity": "critical", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 2, "severity": "critical", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 3, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 4, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 5, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 6, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 7, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 8, "severity": "medium", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 9, "severity": "medium", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 10, "severity": "low", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 11, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 12, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
+        {"id": 13, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
+    ]
+
+
+    return jsonify(vulnTable)
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)

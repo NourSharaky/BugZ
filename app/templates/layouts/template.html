@@ -8,6 +8,7 @@
     <title>BugZ</title>
     <link rel="shortcut icon" type="image/png" href="static/images/logoGraphic.png" />
     <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/tabulator.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='css/styles.css')}}">
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
@@ -27,10 +28,17 @@
 
 
     {% block scripts %}
-        <script src="static/js/darkMode.js"></script>
-        <script src="static/js/actions.js"></script>
-        <script src="static/js/flowbite.min.js"></script>
-        <script src="static/js/JQuery.min.js"></script>
+    <script src="static/js/darkMode.js"></script>
+    <script src="static/js/actions.js"></script>
+    <script src="static/js/JQuery.min.js"></script>
+    <script src="static/js/exports/jspdf.umd.min.js"></script>
+    <script src="static/js/exports/jspdf.plugin.autotable.min.js"></script>
+    <script src="static/js/exports/xlsx.full.min.js"></script>
+    <script src="static/js/tabulator.min.js"></script>
+    <script src="static/js/chart.js"></script>
+    <script src="static/js/chartjs-plugin-datalabels@2.js"></script>
+    <script src="static/js/data.js"></script>
+    <script src="static/js/flowbite.min.js"></script>
 
     {% endblock %}
 </body>

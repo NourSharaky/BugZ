@@ -47,7 +47,7 @@
         border-color: #007bff;
     }
 
-    #info{
+    #informational{
         border-color: #24b817;
     }
 
@@ -75,41 +75,8 @@
         <p class="count"></p>
         <h3 class="header">Low</h3>
     </div>
-    <div class="card" id="info">
+    <div class="card" id="informational">
         <p class="count"></p>
         <h3 class="header">Informational</h3>
     </div>
 </div>
-
-</div>
-
-
-<script>
-    // Get the cards
-    const cards = document.querySelectorAll('.card');
-
-    document.addEventListener('DOMContentLoaded', onLoad);
-
-    function onLoad()
-    {
-        // Get Count Using JQuery
-        $.get('/api/severitySummary', function (data) {
-            
-            // Loop through the cards
-            cards.forEach(card => {
-                // Get the count
-                const count = card.querySelector('.count');
-                
-                // Get the header
-                const header = card.querySelector('.header');
-                
-                // Get the severity
-                const severity = card.id;
-                
-                count.innerHTML = data[severity];
-                
-
-            });
-        });
-    }
-</script>

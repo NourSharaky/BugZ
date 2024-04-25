@@ -9,10 +9,8 @@ if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localS
 }
 
 var themeToggleBtn = document.getElementById('theme-toggle');
-console.log(themeToggleBtn);
 
 themeToggleBtn.addEventListener('click', function () {
-    console.log('clicked');
     // toggle icons inside button
     themeToggleDarkIcon.classList.toggle('hidden');
     themeToggleLightIcon.classList.toggle('hidden');

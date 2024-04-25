@@ -11,3 +11,85 @@
     color: #333;
     margin-bottom: 1rem;
 }
+
+.vulnSummaryDiagrams{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+}
+
+.vulnSummaryDiagrams .vulnTable{
+    width: 70%;
+    height: auto;
+}
+
+.vulnSummaryDiagrams .vulnPieChart{
+    width: 30%;
+    height: auto;
+    align-items:baseline;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/*Theme the Tabulator element*/
+#example-table{
+    background-color:#ccc;
+    border: 1px solid #333;
+    border-radius: 5px;
+}
+
+/*Theme the header*/
+#example-table .tabulator-header {
+    background-color:#333;
+    color:black;
+    border-bottom: 1px solid #333;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+/*Allow column header names to wrap lines*/
+#example-table .tabulator-header .tabulator-col,
+#example-table .tabulator-header .tabulator-col-row-handle {
+    white-space: normal;
+}
+
+/*Color the table rows*/
+#example-table .tabulator-tableholder .tabulator-table .tabulator-row{
+    color:black;
+    background-color: #ffffff;
+}
+
+/*Color even rows*/
+#example-table .tabulator-tableholder .tabulator-table .tabulator-row:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+.exportSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    padding: 5px;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+}
+.exportSection .exportTxt{
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.exportSection .exportBtn{
+    background-color: #711ed1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: small;
+}
+.exportSection .exportBtn:hover{
+    background-color: #521597;
+}

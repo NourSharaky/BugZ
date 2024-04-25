@@ -1,5 +1,8 @@
 var dirButton = document.getElementById('dirButton');
-dirButton.addEventListener('click', getTargetFolder);
+
+if (dirButton) {
+    dirButton.addEventListener('click', getTargetFolder);
+}
 
 function getTargetFolder() {
 
