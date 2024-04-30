@@ -1,42 +1,40 @@
+import bandit.blacklists
+import bandit.blacklists.calls
 from classes.PythonParser import PythonParser
 from termcolor import colored
 from pprint import pprint
+import bandit 
 
 if __name__ == "__main__":
 
+    # x = bandit.blacklists.calls.gen_blacklist().items().__iter__().__next__()
+
+    # pprint(x)
+
     print(colored("BugZ Initialized", "magenta"))
 
-    # Read the code from a file
-    targetFile = "..\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main\\NoteTaking\\app.py"
-    # Read the requirements from a file
-    # requirementsFile = "..\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main\\requirements.txt"
-
     projectFolder = "D:\\TKH\\BugZ\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main"
-    parser = PythonParser(logging=True, projectFolder=projectFolder)
-    # parser.parseFile()
-    # parser.basicParse()
+    parser = PythonParser(logging=False, projectFolder=projectFolder)
+    
 
     pythonFiles , requirementsFile = parser.scanDirectory()
 
-    # vulnLibs, LibsMissingVersion = parser.checkVulnLibs()
 
-    # print(colored("Vulnerable Libraries: ", "red"))
-    # pprint(vulnLibs)
-
-    # print(colored("Libraries Missing Version: ", "yellow"))
-    # pprint(LibsMissingVersion)
-
-    # print(colored("Vulnerable Imports: ", "red"))
-    # vulnImports = parser.checkVulnImports()
-    # pprint(vulnImports)
-
-    # print(colored("Advanced Vulnerable Libraries: ", "red"))
+    # print(colored("Vulnerable Libraries in requirements: ", "red"))
     # advancedVulnLibs =  parser.advancedCheckVulnLibs()
     # pprint(advancedVulnLibs)
 
-    pprint(parser.scanPythonFiles())
+    # print(colored("Vulnerable Imports in files: ", "red"))
+    # pprint(parser.scanPythonFiles())
 
+    print(colored("Vulnerablities in files: ", "red"))
+    print(parser.filesVulnScan())
     
+
+
+
+
+
 
 
 

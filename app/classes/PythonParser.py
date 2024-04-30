@@ -4,15 +4,40 @@ from tree_sitter import Language, Parser
 from pprint import pprint
 from termcolor import colored
 import json,re,os
-
+import subprocess
 # Graphical User interface
-# Probably flask-based web interface
+
 
 # LIBRARIES 
 # TODO: GUI
 
+
 class PythonParser:
     def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None):
+        """
+        Initialize the VulnerabilityScanner class.
+
+        Args:
+            targetFile (str, optional): Path to the target file to be scanned. Defaults to None.
+            targetReqFile (str, optional): Path to the target requirements file to be scanned. Defaults to None.
+            logging (bool, optional): Flag indicating whether logging should be enabled. Defaults to False.
+            projectFolder (str, optional): Path to the project folder. Defaults to None.
+
+        Attributes:
+            language (Language): Instance of the Language class initialized with the language of the target file.
+            targetFile (str): Path to the target file to be scanned.
+            targetReqFile (str): Path to the target requirements file to be scanned.
+            parser (Parser): Instance of the Parser class.
+            sourceCode (str): Source code of the target file.
+            tree (Tree): Abstract syntax tree representation of the source code.
+            vulnDBFileName (str): Path to the file containing the vulnerability database.
+            vulnDB (dict): Dictionary containing vulnerabilities loaded from the database file.
+            fullVulnDBFileName (str): Path to the file containing the full vulnerability database.
+            fullVulnDB (dict): Dictionary containing full vulnerabilities loaded from the database file.
+            logging (bool): Flag indicating whether logging is enabled.
+            projectFolder (str): Path to the project folder.
+        """
+
         self.language = Language(tspython.language(), "python")
         self.targetFile = targetFile
         self.targetReqFile = targetReqFile
@@ -25,11 +50,12 @@ class PythonParser:
         self.fullVulnDBFileName = 'db\\insecure_full.json'
         self.fullVulnDB = self.LoadDB(self.fullVulnDBFileName)
         self.logging = logging
-        self.projectFolder = projectFolder
-
-        
+        self.projectFolder = projectFolder    
 
     def scanDirectory(self):
+        """
+        Scans the target directory for Python files and requirements.txt file.
+        """
         if self.logging:
             print(colored("Target Project Directory: ", "green") + self.projectFolder + "\n----------------------")
         pythonFiles = []
@@ -59,21 +85,45 @@ class PythonParser:
         return pythonFiles, requirementsFile
 
     def LoadDB(self, DBName):
+        """
+        Load the database from the specified file.
+
+        Args:
+            DBName (str): Path to the database file.
+        """
         with open(DBName, 'r') as json_file:
             db = json.load(json_file) 
 
         return db
     
     def parseFile(self):
+        """
+        Parse the target file and generate the syntax tree.
+        """
+
         with open(self.targetFile, "rb") as file:
             self.sourceCode = file.read()
         self.tree = self.parser.parse(self.sourceCode)
 
     def query(self, queryString):
+        """
+        Execute the query on the syntax tree and return the captured data.
+
+        Args:
+            queryString (str): Query string to be executed on the syntax tree.
+        """
         query = self.language.query(queryString)
         return query.captures(self.tree.root_node)
 
     def printCaptured(self, title, captured):
+        """
+        Print the captured data along with the title.
+        
+        Args:
+            title (str): Title to be printed.
+            captured (list): List of captured data.
+        """
+
         print(colored(title, "red"))
         print(colored("Captured:", "green"), len(captured), "occurrences")
         for i in captured:
@@ -82,6 +132,10 @@ class PythonParser:
         print(colored("-----------------------------------------------------------------------","white"))
 
     def basicParse(self):
+        """
+        Parse the target file and capture the basic elements.
+        """
+
         queries = {
             "Imports": "(import_statement) @importStatement",
             "Imports from": "(import_from_statement) @importFromStatement",
@@ -96,6 +150,9 @@ class PythonParser:
         return self.queryParse(queries)
     
     def advancedParse(self):
+        """
+        Parse the target file and capture the advanced elements.
+        """
         queries = {
         "Imports": "(import_statement) @importStatement",
         "Imports Names": "(import_statement (dotted_name) @importName)",
@@ -112,6 +169,13 @@ class PythonParser:
         return self.queryParse(queries)
     
     def queryParse(self, queries):
+        """
+        Execute the queries on the syntax tree and parse the captured data.
+
+        Args:
+            queries (dict): Dictionary containing the title and query string to be executed.
+        """
+
         parsedFile = {}
 
         for title, query in queries.items():
@@ -131,6 +195,13 @@ class PythonParser:
         return parsedFile
 
     def requirementsParse(self, location):
+        """
+        Parse the requirements file and extract the package names and versions.
+
+        Args:
+            location (str): Path to the requirements file.
+        """
+
         with open(location, "r") as file:
             lines = file.readlines()
 
@@ -152,7 +223,9 @@ class PythonParser:
         return requirements
             
     def checkVulnLibs(self):
-        
+        """
+        Check if the libraries in the requirements file are vulnerable.
+        """
         vulnLibs = {}
         # Define a regular expression pattern to match the operator and the value
         pattern = r'(==|[<>]=?)([0-9a-zA-Z.]+)'
@@ -204,6 +277,9 @@ class PythonParser:
         return vulnLibs, LibsMissingVersion
 
     def advancedCheckVulnLibs(self):
+        """
+        Check if the libraries in the requirements file are vulnerable.
+        """
         vulnLibs , _ = self.checkVulnLibs()
         output = {}
         # print(vulnLibs)
@@ -220,6 +296,9 @@ class PythonParser:
         return output              
                     
     def checkVulnImports(self):
+        """
+        Check if the imported libraries are vulnerable.
+        """
         # checks if an imported library is not in requirements.txt and is vulnerable
         query = {
             "Imports Names": "(import_statement (dotted_name) @importName)",
@@ -247,6 +326,10 @@ class PythonParser:
         return vulnLibs
 
     def scanPythonFiles(self):
+        """
+        Scan the Python files in the target directory for vulnerable imports.
+        """
+
         pythonFiles , _= self.scanDirectory()
 
         output = {}
@@ -258,6 +341,32 @@ class PythonParser:
             output[pythonFile] = {"Vulnerable Imports" : vulnerableImports}
 
         return output
+
+    def filesVulnScan(self):
+        files , _ = self.scanDirectory()
+
+        output = {}
+
+        for file in files:
+            # Create a Thread for each file and run bandit for that file
+            # Use the bandit API to get the results
+           # Run Bandit using subprocess
+            bandit = subprocess.Popen(["python", "-m", "bandit", "-f", "json", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            # Get output as a single string
+            json_out = json.loads(bandit.stdout.read().decode())
+
+            
+            # remove attriutes from json
+            for res in json_out["results"]:
+                del res["more_info"]
+                del res["test_id"] 
+
+            output[file] = json_out
+            
+        return output
+
+
 
 
  

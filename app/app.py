@@ -75,6 +75,14 @@ def severitySummary():
     if parser is None:
         abort(404)
 
+    # Call ImportedLibScan
+
+    # Call FileVulnScan to get the vulnerabilities
+    
+    # Build Response JSON
+        # Categorize into the Severity Summary 
+
+
 # TODO: Implement the severity summary
     severitySummary = {
         "critical": 1,
