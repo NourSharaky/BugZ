@@ -1,4 +1,3 @@
-import bandit.blacklists
 import bandit.blacklists.calls
 from classes.PythonParser import PythonParser
 from termcolor import colored
@@ -8,7 +7,6 @@ import bandit
 if __name__ == "__main__":
 
     # x = bandit.blacklists.calls.gen_blacklist().items().__iter__().__next__()
-
     # pprint(x)
 
     print(colored("BugZ Initialized", "magenta"))
@@ -20,15 +18,17 @@ if __name__ == "__main__":
     pythonFiles , requirementsFile = parser.scanDirectory()
 
 
-    # print(colored("Vulnerable Libraries in requirements: ", "red"))
-    # advancedVulnLibs =  parser.advancedCheckVulnLibs()
-    # pprint(advancedVulnLibs)
+    print(colored("Vulnerable Libraries in requirements: ", "red"))
+    requirementsFileVulnFullScan =  parser.requirementsFileVulnFullScan()
+    print(requirementsFileVulnFullScan)
 
     # print(colored("Vulnerable Imports in files: ", "red"))
-    # pprint(parser.scanPythonFiles())
+    # pprint(parser.pyFilesImportsScan())
+
+    print("----------------------------------------------------------------------------------------")
 
     print(colored("Vulnerablities in files: ", "red"))
-    print(parser.filesVulnScan())
+    print(parser.pyFilesGeneralScan())
     
 
 

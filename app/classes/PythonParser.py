@@ -5,14 +5,10 @@ from pprint import pprint
 from termcolor import colored
 import json,re,os
 import subprocess
-# Graphical User interface
-
-
-# LIBRARIES 
-# TODO: GUI
 
 
 class PythonParser:
+    # ---------------------------------- Initialization ----------------------------------
     def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None):
         """
         Initialize the VulnerabilityScanner class.
@@ -52,6 +48,8 @@ class PythonParser:
         self.logging = logging
         self.projectFolder = projectFolder    
 
+    # ---------------------------------- Directory Scanning ----------------------------------
+
     def scanDirectory(self):
         """
         Scans the target directory for Python files and requirements.txt file.
@@ -83,19 +81,9 @@ class PythonParser:
 
 
         return pythonFiles, requirementsFile
-
-    def LoadDB(self, DBName):
-        """
-        Load the database from the specified file.
-
-        Args:
-            DBName (str): Path to the database file.
-        """
-        with open(DBName, 'r') as json_file:
-            db = json.load(json_file) 
-
-        return db
     
+    # ---------------------------------- Parsing ----------------------------------
+
     def parseFile(self):
         """
         Parse the target file and generate the syntax tree.
@@ -105,33 +93,7 @@ class PythonParser:
             self.sourceCode = file.read()
         self.tree = self.parser.parse(self.sourceCode)
 
-    def query(self, queryString):
-        """
-        Execute the query on the syntax tree and return the captured data.
-
-        Args:
-            queryString (str): Query string to be executed on the syntax tree.
-        """
-        query = self.language.query(queryString)
-        return query.captures(self.tree.root_node)
-
-    def printCaptured(self, title, captured):
-        """
-        Print the captured data along with the title.
-        
-        Args:
-            title (str): Title to be printed.
-            captured (list): List of captured data.
-        """
-
-        print(colored(title, "red"))
-        print(colored("Captured:", "green"), len(captured), "occurrences")
-        for i in captured:
-            # print(i[1], i[0].start_point, i[0].end_point, i[0].text)
-            print(i[0].text.decode("utf-8"))
-        print(colored("-----------------------------------------------------------------------","white"))
-
-    def basicParse(self):
+    def defaultParse(self, advanced=False):
         """
         Parse the target file and capture the basic elements.
         """
@@ -147,28 +109,23 @@ class PythonParser:
             "Strings": "(string) @string",
             "Comments": "(comment) @comment",
         }
-        return self.queryParse(queries)
-    
-    def advancedParse(self):
+
+        if advanced:
+            queries["Imports Names"] = "(import_statement (dotted_name) @importName)"
+            queries["Imports from Names"] = "(import_from_statement module_name: (dotted_name) @importFromName)"
+        return self.multiQuery(queries)
+
+    def query(self, queryString):
         """
-        Parse the target file and capture the advanced elements.
+        Execute the query on the syntax tree and return the captured data.
+
+        Args:
+            queryString (str): Query string to be executed on the syntax tree.
         """
-        queries = {
-        "Imports": "(import_statement) @importStatement",
-        "Imports Names": "(import_statement (dotted_name) @importName)",
-        "Imports from": "(import_from_statement) @importFromStatement",
-        "Imports from Names": "(import_from_statement module_name: (dotted_name) @importFromName)",
-        "Imports Functions": "(import_from_statement name: (dotted_name) @importFromFunctions)",
-        "Class Definitions": "(class_definition) @classDefinition",
-        "Function Definitions": "(function_definition) @functionDefinition",
-        "Function Names": "(function_definition name: (identifier) @functionName)",
-        "Assignments": "(assignment) @assignment",
-        "Strings": "(string) @string",
-        "Comments": "(comment) @comment",
-        }
-        return self.queryParse(queries)
-    
-    def queryParse(self, queries):
+        query = self.language.query(queryString)
+        return query.captures(self.tree.root_node)
+
+    def multiQuery(self, queries):
         """
         Execute the queries on the syntax tree and parse the captured data.
 
@@ -190,9 +147,39 @@ class PythonParser:
             for i in captured:
                 parsedFile[title].append(i[0].text.decode("utf-8"))
             
-
-
         return parsedFile
+
+    def printCaptured(self, title, captured):
+        """
+        Print the captured data along with the title.
+        
+        Args:
+            title (str): Title to be printed.
+            captured (list): List of captured data.
+        """
+
+        print(colored(title, "red"))
+        print(colored("Captured:", "green"), len(captured), "occurrences")
+        for i in captured:
+            # print(i[1], i[0].start_point, i[0].end_point, i[0].text)
+            print(i[0].text.decode("utf-8"))
+        print(colored("-----------------------------------------------------------------------","white"))
+
+    # ---------------------------------- Vulnerability Scanning ----------------------------------
+
+    # Requirements
+
+    def LoadDB(self, DBName):
+        """
+        Load the database from the specified file.
+
+        Args:
+            DBName (str): Path to the database file.
+        """
+        with open(DBName, 'r') as json_file:
+            db = json.load(json_file) 
+
+        return db
 
     def requirementsParse(self, location):
         """
@@ -222,7 +209,7 @@ class PythonParser:
         
         return requirements
             
-    def checkVulnLibs(self):
+    def requirementsFileVulnScan(self):
         """
         Check if the libraries in the requirements file are vulnerable.
         """
@@ -276,11 +263,11 @@ class PythonParser:
                         print(RequiredLib, ReqLibVersion, "is vulnerable to attacks", conditions)
         return vulnLibs, LibsMissingVersion
 
-    def advancedCheckVulnLibs(self):
+    def requirementsFileVulnFullScan(self):
         """
         Check if the libraries in the requirements file are vulnerable.
         """
-        vulnLibs , _ = self.checkVulnLibs()
+        vulnLibs , _ = self.requirementsFileVulnScan()
         output = {}
         # print(vulnLibs)
         for vulnLibName in vulnLibs.keys():
@@ -294,8 +281,10 @@ class PythonParser:
                        self.fullVulnDB[vulnLibName][i]["Current Version"] = vulnLibs[vulnLibName]["Current Version"]
                        output[vulnLibName] = self.fullVulnDB[vulnLibName][i]
         return output              
-                    
-    def checkVulnImports(self):
+
+    # Imports
+                  
+    def importsScan(self):
         """
         Check if the imported libraries are vulnerable.
         """
@@ -304,7 +293,7 @@ class PythonParser:
             "Imports Names": "(import_statement (dotted_name) @importName)",
             "Imports from Names": "(import_from_statement module_name: (dotted_name) @importFromName)"
             }
-        queryOutput = self.queryParse(query)
+        queryOutput = self.multiQuery(query)
 
         imports = queryOutput["Imports Names"] + queryOutput["Imports from Names"]
 
@@ -325,7 +314,7 @@ class PythonParser:
 
         return vulnLibs
 
-    def scanPythonFiles(self):
+    def pyFilesImportsScan(self):
         """
         Scan the Python files in the target directory for vulnerable imports.
         """
@@ -337,12 +326,14 @@ class PythonParser:
         for pythonFile in pythonFiles:
             self.targetFile = pythonFile
             self.parseFile()
-            vulnerableImports = self.checkVulnImports()
+            vulnerableImports = self.importsScan()
             output[pythonFile] = {"Vulnerable Imports" : vulnerableImports}
 
         return output
 
-    def filesVulnScan(self):
+    # Python Files
+
+    def pyFilesGeneralScan(self):
         files , _ = self.scanDirectory()
 
         output = {}
