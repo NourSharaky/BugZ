@@ -31,7 +31,7 @@ def getTargetFolder():
     return jsonify(projectFolder)
 
 @app.route("/dashboard",methods=['POST','GET'])
-def dashboard():
+def dashboard(scanMode="fullScan"):
     global parser
     if parser is None:
         abort(404)
@@ -42,6 +42,8 @@ def dashboard():
         projectPath = session.get('projectPath', None)
         pythonFiles = session.get('pythonFiles', [])
         requirementsFile = session.get('requirementsFile', "")
+        scanMode = session.get('scanMode', "")
+        
 
         files = []
         for file in pythonFiles:
@@ -51,14 +53,25 @@ def dashboard():
         if requirementsFile != None and requirementsFile != "":
             requirementsFile = str(requirementsFile).split(projectPath)[-1]
         
-        return render_template('dashboard.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+        if scanMode == "dependencyScan":
+            return render_template('dependencyScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+        elif scanMode == "codeScan":
+            return render_template('codeScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+        elif scanMode == "fullScan":
+            return render_template('fullScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+        else:
+            return render_template('404.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+
+
     else:
         # POST request: update session data
         projectName = request.form['projectName']
         projectPath = request.form['projectPath']
+        scanMode = request.form['scanMode']
         
         session['projectName'] = projectName  # Store projectName in session
         session['projectPath'] = projectPath
+        session['scanMode'] = scanMode
         parser.projectFolder = projectPath
         
         pythonFiles, requirementsFile = parser.scanDirectory()
@@ -66,7 +79,7 @@ def dashboard():
         # Store these in the session as well
         session['pythonFiles'] = pythonFiles
         session['requirementsFile'] = requirementsFile
-
+        
         return redirect(url_for('dashboard'))
 
 @app.route("/api/severitySummary")

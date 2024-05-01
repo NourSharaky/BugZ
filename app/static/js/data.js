@@ -1,6 +1,6 @@
-
-document.addEventListener('DOMContentLoaded', onLoad);
-
+if (window.location.pathname == '/dashboard') {
+    document.addEventListener('DOMContentLoaded', onLoad);
+}
 function onLoad() {
     
     const pieChart = document.getElementById('pieChart');
@@ -37,7 +37,6 @@ function onLoad() {
 
 }    
 
-
 function fillCards(severityCounts){
 
     const cards = document.querySelectorAll('.card');
@@ -58,7 +57,6 @@ function fillCards(severityCounts){
 
     });
 }
-
 
 function fillTable(data){
     var severityColors = {
@@ -135,8 +133,6 @@ function fillTable(data){
         table.print(false, true);
     });
 }
-
-
 
 function fillChart(severityCounts){
 

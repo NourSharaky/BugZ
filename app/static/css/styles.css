@@ -93,3 +93,48 @@
 .exportSection .exportBtn:hover{
     background-color: #521597;
 }
+
+.logo {
+    width: 500px;
+    margin: 50px auto auto auto;
+    display: block;
+}
+
+.SelectDir {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 0 1.5rem;
+}
+
+#dirForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.DirSection {
+    display: flex;
+
+}
+
+#dirButton {
+    border-radius: 0.25rem 0 0 0.25rem;
+}
+
+#dirInput {
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.scanModes {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.scanModes button {
+    border-radius: 0.25rem;
+    width: 15rem;
+}

@@ -2,51 +2,29 @@
 
 {% block content %}
 
-<style>
-    .logo {
-        width: 500px;
-        margin: 70px auto auto auto;
-        display: block;
-    }
-    .SelectDir {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-
-    .DirSection {
-        display: flex;
-        
-    }
-
-    #dirButton {
-        border-radius: 0.25rem 0 0 0.25rem ;
-    }
-
-    #dirInput {
-        border-radius: 0 0.25rem 0.25rem 0;
-    }
-</style>
-
 <div>
     <img class="logo" src="static/images/logo.png" alt="">
 </div>
 <div class="SelectDir">
-<form id="dirForm" action="/dashboard" method="POST">
-    <div>
-        <label for="dirInput" class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Project Name</label>
-        <input name="projectName" id="projectName" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Project Name" required />
-    </div>
-    <div>
-        <label for="dirInput" class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Target Path</label>
-        <div class="DirSection">
-            <button id="dirButton" type="button"class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-lg px-5 py-2.5  dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Browse</button>
-            <input name="projectPath" type="text" id="dirInput" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"placeholder="path/to/dir" required />
+    <form id="dirForm" action="/dashboard" method="POST">
+        <div>
+            <label for="dirInput" class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Project Name</label>
+            <input name="projectName" id="projectName" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Project Name" required />
         </div>
-    </div>
-    
-    <button id="submitDir" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 mx-auto  font-medium rounded-lg text-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Start</button>
-</form>  
+        <div>
+            <label for="dirInput" class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Target Path</label>
+            <div class="DirSection">
+                <button id="dirButton" type="button"class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-lg px-5 py-2.5  dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Browse</button>
+                <input name="projectPath" type="text" id="dirInput" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"placeholder="path/to/dir" required />
+            </div>
+        </div>
+        <input type="hidden" name="scanMode" value="fullScan" id="scanMode">
+        <div class="scanModes">
+            <button id="dependencyScan" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Dependency Scan</button>
+            <button id="codeScan" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Code Scan</button>
+            <button id="fullScan" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Full Scan</button>
+        </div>
+        
+    </form>  
 </div>
     {% endblock %}
