@@ -358,7 +358,30 @@ class PythonParser:
         return output
 
 
+    # ---------------------------------- Vulnerability Scanning Modes ----------------------------------
 
+    def dependencyScan(self):
+        output = {}
+
+        output["Requirements"] = self.requirementsFileVulnFullScan()
+        output["Imports"] = self.pyFilesImportsScan()
+        
+        return output
+
+    def codeScan(self):
+        output = {} 
+
+        output["Files"] = self.pyFilesGeneralScan()
+        
+        return output
+
+    def fullScan(self):
+        output = {}
+
+        output["Dependencies"] = self.dependencyScan()
+        output["Code"] = self.codeScan()
+
+        return output
 
  
                 
