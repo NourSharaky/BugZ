@@ -25,68 +25,10 @@
 
 <h2 class="h2">Vulnerable Dependencies Details:</h2>
 
-<style>
-    .vulnLibs-Container{
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-    }
-    .file-Container{
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-        padding: 0 10px 20px 10px;
-        margin: 0 0 10px 0;
-        background-color: rgb(213, 213, 213);
-        border-radius: 25px;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-        
-    }
-    .fileName{
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin: 10px 0;
-        width: 100%;
-        padding: 5px 5px 0px 15px;
-        
-    }
-    .vulnLib-section{
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-        border: 1px solid #ccc;
-        padding: 20px;
-        margin: 7px ;
-        background-color: #fffdfd;
-        border-radius: 25px;
-        box-shadow: 0 0 10px 0 rgba(25, 25, 25, 0.1);
-    }
-
-    .vulnLib-section .field {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        margin: 5px 0;
-    }
-
-    .vulnLib-section .field .title {
-        font-weight: bold;
-        margin-right: 5px;
-    }
-    
-    .vulnLib-section .field .name {
-        font-weight: bold;
-        color: #ff24ab;
-    }
-
-    .vulnLib-section .field .libDescription {
-        text-align: justify;
-    }
-</style>
 
 <div class="vulnLibs-Container">
     {% if scanOutput['Requirements']|length > 0 or scanOutput['Missing Versions']|length > 0 %}
-    <div class="file-Container">
+    <div id="RequirementsSection" class="file-Container">
         <div class="fileName">Requirements.txt</div>
         {% for lib in scanOutput['Requirements'] %}
         <div class="vulnLib-section">
@@ -146,7 +88,7 @@
 
     {% for file in scanOutput['Imports'] %}
 
-    <div class="file-Container">
+    <div id="{{file.split(projectPath)[-1]}}" class="file-Container">
         <div class="fileName">{{file}}</div>
         {% for lib in scanOutput['Imports'][file] %}
         <div class="vulnLib-section">

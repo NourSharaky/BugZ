@@ -66,7 +66,7 @@ def dashboard(scanMode="fullScan"):
             scanOutput = None
             template = '404.html'
 
-        return render_template(template, projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile, scanOutput=scanOutput)
+        return render_template(template,projectPath=projectPath ,projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile, scanOutput=scanOutput)
 
 
     else:
