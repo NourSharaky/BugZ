@@ -1,1 +1,178 @@
-<h1>DependencyScan</h1>
+{% extends 'layouts/template.html' %}
+
+{% block content %}
+<h1 class="h1">Project Title: <span style="font-weight:normal;">{{projectName}}</span></h1>
+<hr><br>
+
+<h2 class="h2">Vulnerable Dependencies Summary:</h2>
+
+
+<div class="totalsBar" id="totalsBar">
+    {% if scanOutput['Requirements']|length > 0 or scanOutput['Missing Versions']|length > 0 %}
+    <span class="totalsSection" title="Requirements.txt" >
+        {{scanOutput['Requirements']|length + scanOutput['Missing Versions']|length}}
+    </span>
+    {% endif %}
+
+    {% for file in scanOutput['Imports'] %}
+    <span class="totalsSection" title="{{file}}">
+        {{scanOutput['Imports'][file]|length}}
+    </span>
+    {% endfor %}
+</div>
+
+<br><hr><br>
+
+<h2 class="h2">Vulnerable Dependencies Details:</h2>
+
+<style>
+    .vulnLibs-Container{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+    .file-Container{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        padding: 0 10px 20px 10px;
+        margin: 0 0 10px 0;
+        background-color: rgb(213, 213, 213);
+        border-radius: 25px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        
+    }
+    .fileName{
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 10px 0;
+        width: 100%;
+        padding: 5px 5px 0px 15px;
+        
+    }
+    .vulnLib-section{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin: 7px ;
+        background-color: #fffdfd;
+        border-radius: 25px;
+        box-shadow: 0 0 10px 0 rgba(25, 25, 25, 0.1);
+    }
+
+    .vulnLib-section .field {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        margin: 5px 0;
+    }
+
+    .vulnLib-section .field .title {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    
+    .vulnLib-section .field .name {
+        font-weight: bold;
+        color: #ff24ab;
+    }
+
+    .vulnLib-section .field .libDescription {
+        text-align: justify;
+    }
+</style>
+
+<div class="vulnLibs-Container">
+    {% if scanOutput['Requirements']|length > 0 or scanOutput['Missing Versions']|length > 0 %}
+    <div class="file-Container">
+        <div class="fileName">Requirements.txt</div>
+        {% for lib in scanOutput['Requirements'] %}
+        <div class="vulnLib-section">
+            <div class="field">
+                <span class="title">Library Name: </span>
+                <span class="name">{{lib}}</span>
+            </div>
+            <div class="field">
+                <span class="title">CVE: </span>
+                <span class="libCVE">{{scanOutput['Requirements'][lib]['cve']}}</span>
+            </div>
+            <div class="field" style="flex-direction: column;">
+                <span class="title">Description: </span>
+                <span class="libDescription">{{scanOutput['Requirements'][lib]['advisory']}}</span>
+            </div>
+            <div class="field">
+                <span class="title">Vulnerable Versions Range: </span>
+                <span class="libVulnRange">{{scanOutput['Requirements'][lib]['v']}}</span>
+            </div>
+            <div class="field">
+                <span class="title">Current Version: </span>
+                <span class="libVersion">{{scanOutput['Requirements'][lib]['Current Version']}}</span>
+            </div>
+            <div class="field">
+                <span class="title">Recommendation: </span>
+                <span class="libRecommendation">Update {{lib}} to latest version available.</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% for lib in scanOutput['Missing Versions'] %}
+        <div class="vulnLib-section">
+            <div class="field">
+                <span class="title">Library Name: </span>
+                <span class="name">{{lib}}</span>
+            </div>
+            <div class="field" style="flex-direction: column;">
+                <span class="title" >Description: </span>
+                <span class="libDescription">The detected {{lib}} library has vulnerabilities in certain versions.</span>
+            </div>
+            <div class="field"> 
+                <span class="title">Vulnerable Versions Range: </span>
+                {% for version in scanOutput['Missing Versions'][lib][:-1] %}
+                    <span class="libVulnRange">{{version}}</span>
+                    <span class="libVulnRange">,</span>
+                {% endfor %}
+                    <span class="libVulnRange">{{scanOutput['Missing Versions'][lib][-1]}}</span>
+            </div>
+            <div class="field">
+                <span class="title">Recommendation: </span>
+                <span class="libRecommendation">Include library version in Requirements.txt. <br>Update {{lib}} to latest version available. </span>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for file in scanOutput['Imports'] %}
+
+    <div class="file-Container">
+        <div class="fileName">{{file}}</div>
+        {% for lib in scanOutput['Imports'][file] %}
+        <div class="vulnLib-section">
+            <div class="field">
+                <span class="title">Library Name: </span>
+                <span class="name">{{lib}}</span>
+            </div>
+            <div class="field" style="flex-direction: column;">
+                <span class="title">Description: </span>
+                <span class="libDescription">The detected {{lib}} library has vulnerabilities in certain versions.</span>
+            </div>
+            <div class="field">
+                <span class="title">Vulnerable Versions Range: </span>
+                {% for version in scanOutput['Imports'][file][lib][:-1] %}
+                    <span class="libVulnRange">{{version}}</span>
+                    <span class="libVulnRange">,</span>
+                {% endfor %}
+                <span class="libVulnRange">{{scanOutput['Imports'][file][lib][-1]}}</span>
+            </div>
+            <div class="field">
+                <span class="title">Recommendation: </span>
+                <span class="libRecommendation">Include library version in Requirements.txt. <br>Update {{lib}} to latest version available.</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+{% endblock %}

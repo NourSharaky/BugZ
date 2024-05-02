@@ -1,3 +1,7 @@
+*{
+    transition: all 0.4s;
+}
+
 .h1{
     font-size: 2rem;
     font-weight: bolder;
@@ -7,6 +11,13 @@
 
 .h2 {
     font-size: 1.8rem;
+    font-weight: bolder;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.h3 {
+    font-size: 1.6rem;
     font-weight: bolder;
     color: #333;
     margin-bottom: 1rem;
@@ -137,4 +148,23 @@
 .scanModes button {
     border-radius: 0.25rem;
     width: 15rem;
+}
+
+.totalsBar {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.totalsSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: 0.3s;
+    display: none;
 }

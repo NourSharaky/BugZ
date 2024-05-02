@@ -54,13 +54,19 @@ def dashboard(scanMode="fullScan"):
             requirementsFile = str(requirementsFile).split(projectPath)[-1]
         
         if scanMode == "dependencyScan":
-            return render_template('dependencyScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+            scanOutput = parser.dependencyScan()
+            template = 'dependencyScan.html'
         elif scanMode == "codeScan":
-            return render_template('codeScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+            scanOutput = parser.codeScan()
+            template = 'codeScan.html'
         elif scanMode == "fullScan":
-            return render_template('fullScan.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+            scanOutput = parser.fullScan()
+            template = 'fullScan.html'
         else:
-            return render_template('404.html', projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile)
+            scanOutput = None
+            template = '404.html'
+
+        return render_template(template, projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile, scanOutput=scanOutput)
 
 
     else:
