@@ -344,6 +344,12 @@ class PythonParser:
         files , _ = self.scanDirectory()
 
         output = {}
+        total_metrics = {
+            'SEVERITY.HIGH': 0,
+            'SEVERITY.MEDIUM': 0,
+            'SEVERITY.LOW': 0,
+            'SEVERITY.UNDEFINED': 0,
+        }
 
         for file in files:
             # Create a Thread for each file and run bandit for that file
@@ -354,14 +360,26 @@ class PythonParser:
             # Get output as a single string
             json_out = json.loads(bandit.stdout.read().decode())
 
+            file_metrics = json_out['metrics']['_totals']
+           
+            # Sum up the metrics
+            for metric , _ in total_metrics.items():
+                total_metrics[metric] += file_metrics[metric]
             
+            # remove metrics & errors from json
+            del json_out['metrics']
+            del json_out['errors']
+
             # remove attriutes from json
             for res in json_out["results"]:
+
                 del res["more_info"]
                 del res["test_id"] 
 
             output[file] = json_out
-            
+        
+        output["Total Metrics"] = total_metrics
+        
         return output
 
 

@@ -32,9 +32,11 @@ if __name__ == "__main__":
     # print(parser.pyFilesGeneralScan())
     
 
-    print(colored("Dependency Scan: ", "red"))
-    print(parser.dependencyScan())
+    # print(colored("Dependency Scan: ", "red"))
+    # print(parser.dependencyScan())
 
+    print(colored("Code Scan: ", "red"))
+    print(parser.codeScan())
 
 
 
