@@ -12,26 +12,28 @@ if __name__ == "__main__":
     print(colored("BugZ Initialized", "magenta"))
 
     projectFolder = "D:\\TKH\\BugZ\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main"
+    # projectFolder = "D:\\TKH\\BugZ\\samples\\vulpy-master"
     parser = PythonParser(logging=False, projectFolder=projectFolder)
     
 
     pythonFiles , requirementsFile = parser.scanDirectory()
 
 
-    print(colored("Vulnerable Libraries in requirements: ", "red"))
-    requirementsFileVulnFullScan =  parser.requirementsFileVulnFullScan()
-    print(requirementsFileVulnFullScan)
+    # print(colored("Vulnerable Libraries in requirements: ", "red"))
+    # requirementsFileVulnFullScan =  parser.requirementsFileVulnFullScan()
+    # print(requirementsFileVulnFullScan)
 
     # print(colored("Vulnerable Imports in files: ", "red"))
     # pprint(parser.pyFilesImportsScan())
 
-    print("----------------------------------------------------------------------------------------")
+    # print("----------------------------------------------------------------------------------------")
 
-    print(colored("Vulnerablities in files: ", "red"))
-    print(parser.pyFilesGeneralScan())
+    # print(colored("Vulnerablities in files: ", "red"))
+    # print(parser.pyFilesGeneralScan())
     
 
-
+    print(colored("Dependency Scan: ", "red"))
+    print(parser.dependencyScan())
 
 
 

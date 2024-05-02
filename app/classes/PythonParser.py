@@ -222,7 +222,7 @@ class PythonParser:
 
         requirements = self.requirementsParse(self.targetReqFile)
         
-        LibsMissingVersion = []
+        LibsMissingVersion = {}
 
         for RequiredLib in requirements:
             if RequiredLib in self.vulnDB:
@@ -230,7 +230,12 @@ class PythonParser:
                 ReqLibVersion = requirements[RequiredLib]
 
                 if ReqLibVersion is None:
-                    LibsMissingVersion.append(RequiredLib)
+                    RequiredLib = RequiredLib.lower()
+                    
+                    if RequiredLib in self.vulnDB:
+                    # store name and versions in vulndb
+                        versions = self.vulnDB[RequiredLib]
+                        LibsMissingVersion[RequiredLib] = versions
                     continue
 
                 # Check if the required version falls within any of the vulnerable version ranges
@@ -327,7 +332,9 @@ class PythonParser:
             self.targetFile = pythonFile
             self.parseFile()
             vulnerableImports = self.importsScan()
-            output[pythonFile] = {"Vulnerable Imports" : vulnerableImports}
+
+            if len(vulnerableImports) > 0:
+                output[pythonFile] = vulnerableImports
 
         return output
 
@@ -364,6 +371,7 @@ class PythonParser:
         output = {}
 
         output["Requirements"] = self.requirementsFileVulnFullScan()
+        _ , output["Missing Versions"] = self.requirementsFileVulnScan()
         output["Imports"] = self.pyFilesImportsScan()
         
         return output
