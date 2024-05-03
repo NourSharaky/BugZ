@@ -5,7 +5,10 @@ from pprint import pprint
 from termcolor import colored
 import json,re,os
 import subprocess
-
+import openai
+from dotenv import load_dotenv
+import os
+from classes.AICodeReviewer import AICodeReviewer
 
 class PythonParser:
     # ---------------------------------- Initialization ----------------------------------
@@ -351,6 +354,8 @@ class PythonParser:
             'SEVERITY.UNDEFINED': 0,
         }
 
+        getRecommendation = {}
+
         for file in files:
             # Create a Thread for each file and run bandit for that file
             # Use the bandit API to get the results
@@ -370,18 +375,22 @@ class PythonParser:
             del json_out['metrics']
             del json_out['errors']
 
+            if len(json_out["results"]) < 1 :
+                continue
+
             # remove attriutes from json
             for res in json_out["results"]:
-
                 del res["more_info"]
                 del res["test_id"] 
+                getRecommendation = {"code": json_out["results"][0]["code"], "issue_text": json_out["results"][0]["issue_text"]}
+                recommendation = self.getAIVulnRecommendation(getRecommendation)
+                res["recommendation"] = recommendation
 
             output[file] = json_out
         
         output["Total Metrics"] = total_metrics
         
         return output
-
 
     # ---------------------------------- Vulnerability Scanning Modes ----------------------------------
 
@@ -409,9 +418,31 @@ class PythonParser:
 
         return output
 
- 
+    # ---------------------------------- AI Code Reviewer ----------------------------------
+
+    def getAIVulnRecommendation(self, vulnData):
+        
+        # Load environment variables from .env file
+        load_dotenv()
+
+        # Retrieve the API key from environment variables
+        api_key = os.getenv('OPENAI_API_KEY')
+
+        # Check if API key is loaded properly
+        if not api_key:
+            raise Exception("API key not found. Please check your .env file.")
+
+        # Create an instance of CodeReviewer
+        reviewer = AICodeReviewer(api_key)
+
+        # Review the code
+        return(reviewer.getVulnRecommendation(vulnData))
+    
+
+
+
+                    
                 
-            
                 
 
 

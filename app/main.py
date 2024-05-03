@@ -1,8 +1,12 @@
 import bandit.blacklists.calls
 from classes.PythonParser import PythonParser
+from classes.AICodeReviewer import AICodeReviewer
 from termcolor import colored
 from pprint import pprint
 import bandit 
+import openai
+from dotenv import load_dotenv
+import os
 
 if __name__ == "__main__":
 
@@ -11,32 +15,22 @@ if __name__ == "__main__":
 
     print(colored("BugZ Initialized", "magenta"))
 
+    # --------------------------- Python Parser ---------------------------
     projectFolder = "D:\\TKH\\BugZ\\samples\\KH6051CEM_Practical_Cryptography_MyNoteTakingApp-main"
     # projectFolder = "D:\\TKH\\BugZ\\samples\\vulpy-master"
     parser = PythonParser(logging=False, projectFolder=projectFolder)
-    
-
-    pythonFiles , requirementsFile = parser.scanDirectory()
-
-
-    # print(colored("Vulnerable Libraries in requirements: ", "red"))
-    # requirementsFileVulnFullScan =  parser.requirementsFileVulnFullScan()
-    # print(requirementsFileVulnFullScan)
-
-    # print(colored("Vulnerable Imports in files: ", "red"))
-    # pprint(parser.pyFilesImportsScan())
-
-    # print("----------------------------------------------------------------------------------------")
-
-    # print(colored("Vulnerablities in files: ", "red"))
-    # print(parser.pyFilesGeneralScan())
-    
+      
+    # --------------------------- Vulnerability Scanning ---------------------------
 
     # print(colored("Dependency Scan: ", "red"))
     # print(parser.dependencyScan())
 
     print(colored("Code Scan: ", "red"))
     print(parser.codeScan())
+
+
+
+
 
 
 
