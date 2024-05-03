@@ -4,9 +4,7 @@ from classes.AICodeReviewer import AICodeReviewer
 from termcolor import colored
 from pprint import pprint
 import bandit 
-import openai
-from dotenv import load_dotenv
-import os
+
 
 if __name__ == "__main__":
 

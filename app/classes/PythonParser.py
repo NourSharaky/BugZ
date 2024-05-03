@@ -5,7 +5,6 @@ from pprint import pprint
 from termcolor import colored
 import json,re,os
 import subprocess
-import openai
 from dotenv import load_dotenv
 import os
 from classes.AICodeReviewer import AICodeReviewer

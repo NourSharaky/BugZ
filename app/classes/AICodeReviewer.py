@@ -1,6 +1,4 @@
 import openai
-from dotenv import load_dotenv
-import os
 
 class AICodeReviewer:
     def __init__(self, api_key):
