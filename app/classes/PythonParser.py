@@ -389,9 +389,9 @@ class PythonParser:
                 del res["line_range"]
 
                 getRecommendation = {"code": json_out["results"][0]["code"], "issue_text": json_out["results"][0]["issue_text"]}
-                # recommendation = self.getAIVulnRecommendation(getRecommendation)
-                # res["recommendation"] = recommendation
-                res["recommendation"] = "Recommendation not available"
+                recommendation = self.getAIVulnRecommendation(getRecommendation)
+                res["recommendation"] = recommendation
+                # res["recommendation"] = "Recommendation not available"
 
             output[file] = json_out
         
