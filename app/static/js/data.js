@@ -76,7 +76,7 @@ function fillTable(data){
             resizable: true,
         },
         pagination: "local",
-        paginationSize: 5,
+        paginationSize: 8,
         paginationSizeSelector: [5,8,10,20,30,40,50],
         movableColumns: true,
         paginationCounter: "rows",
