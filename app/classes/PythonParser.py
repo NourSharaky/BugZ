@@ -381,9 +381,17 @@ class PythonParser:
             for res in json_out["results"]:
                 del res["more_info"]
                 del res["test_id"] 
+                del res["test_name"]
+                del res["col_offset"]
+                del res["end_col_offset"]
+                del res["issue_confidence"]
+                del res["line_number"]
+                del res["line_range"]
+
                 getRecommendation = {"code": json_out["results"][0]["code"], "issue_text": json_out["results"][0]["issue_text"]}
-                recommendation = self.getAIVulnRecommendation(getRecommendation)
-                res["recommendation"] = recommendation
+                # recommendation = self.getAIVulnRecommendation(getRecommendation)
+                # res["recommendation"] = recommendation
+                res["recommendation"] = "Recommendation not available"
 
             output[file] = json_out
         
@@ -415,7 +423,7 @@ class PythonParser:
         output["Dependencies"] = self.dependencyScan()
         output["Code"] = self.codeScan()
 
-        return output
+        return output["Dependencies"]  , output["Code"]
 
     # ---------------------------------- AI Code Reviewer ----------------------------------
 

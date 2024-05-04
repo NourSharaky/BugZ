@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='css/tabulator.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='css/styles.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/snazzy.min.css')}}">
+    <script src="static/js/highlight.min.js"></script>
+    <script src="static/js/python.min.js"></script>
+    
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         document.onload = function () {
@@ -28,6 +32,7 @@
 
 
     {% block scripts %}
+
     <script src="static/js/darkMode.js"></script>
     <script src="static/js/actions.js"></script>
     <script src="static/js/JQuery.min.js"></script>

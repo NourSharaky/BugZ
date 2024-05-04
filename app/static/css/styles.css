@@ -29,16 +29,17 @@
     justify-content: space-between;
     flex-direction: row;
     flex-wrap: wrap;
+    height: max-content;
     
 }
 
 .vulnSummaryDiagrams .vulnTable{
-    width: 70%;
-    height: auto;
+    width: 75%;
+    min-height: 100%;
 }
 
 .vulnSummaryDiagrams .vulnPieChart{
-    width: 30%;
+    width: 25%;
     height: auto;
     align-items:baseline;
     padding: 20px;
@@ -50,6 +51,8 @@
     background-color:#ccc;
     border: 1px solid #333;
     border-radius: 5px;
+    height: 90%;
+    
 }
 
 /*Theme the header*/
@@ -77,7 +80,16 @@
 #example-table .tabulator-tableholder .tabulator-table .tabulator-row:nth-child(even) {
     background-color: #f5f5f5;
 }
+.tabulator-row .tabulator-cell {
+    text-wrap: wrap;   
+    border-bottom: 0.1px solid #333;
+    max-height: fit-content;
+}
 
+.tabulator .tabulator-tableholder{
+    background-color: #ffffff;
+    border: 1px solid #333;
+}
 .exportSection{
     display: flex;
     flex-direction: row;
@@ -85,6 +97,7 @@
     padding: 5px;
     box-sizing: border-box;
     background-color: #f5f5f5;
+    height: 10%;
 }
 .exportSection .exportTxt{
     font-weight: bold;
@@ -173,6 +186,7 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 .file-Container {
@@ -184,6 +198,8 @@
     background-color: rgb(213, 213, 213);
     border-radius: 25px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    width: 100%;
 
 }
 
@@ -228,3 +244,42 @@
 .vulnLib-section .field .libDescription {
     text-align: justify;
 }
+
+.theme-base16-snazzy{
+    border-radius: 5px;
+    margin: 0.5em 1.5em;
+}
+
+
+/* Set color based on inner HTML content */
+span.severity {
+    font-weight: bolder;
+    /* Bold font */
+}
+span.severity.high {
+    color: red;
+    /* Set color to red for 'High' */
+}
+
+span.severity.medium {
+    color: orange;
+    /* Set color to orange for 'Medium' */
+}
+
+span.severity.low {
+    color: yellow;
+    /* Set color to yellow for 'Low' */
+}
+
+span.severity.info {
+    color: green;
+    /* Set color to blue for 'Info' */
+}
+
+.CWE a {
+    color: #00a0c4;
+    text-decoration: underline;
+    font-weight: bolder;
+}
+
+

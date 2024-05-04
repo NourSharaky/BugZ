@@ -5,21 +5,21 @@ function onLoad() {
     
     const pieChart = document.getElementById('pieChart');
 
-    // Get Count Using JQuery
-    $.get('/api/vulnerabilitySummary', function (data) {
-        console.log(data);
-        // Dictionary to store severity counts
-        var severityCounts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "informational": 0};
-        // Calculate counts for each severity
-        data.forEach(function (vuln) {
-            if (severityCounts[vuln.severity]) {
-                severityCounts[vuln.severity]++;
-            }
-            else {
-                severityCounts[vuln.severity] = 1;
-            }
-        });
-        console.log(severityCounts);
+    var data = document.getElementById('data').value;
+    console.log(data);
+    data = JSON.parse(data);
+    
+    var severityCounts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0, "informational": 0};
+    // Calculate counts for each severity
+    data.forEach(function (vuln) {
+        if (severityCounts[vuln.severity]) {
+            severityCounts[vuln.severity]++;
+        }
+        else {
+            severityCounts[vuln.severity] = 1;
+        }
+    });
+    console.log(severityCounts);
 
         // -----------------------------------------------------
         // CARDS
@@ -32,7 +32,7 @@ function onLoad() {
         fillChart(severityCounts);
   
 
-    });
+    //});
 
 
 }    
@@ -60,11 +60,10 @@ function fillCards(severityCounts){
 
 function fillTable(data){
     var severityColors = {
-        "critical": "#dc3545", // critical
-        "high": "#fc8211", // high
-        "medium": "#ffc107", // medium
-        "low": "#007bff", // low
-        "informational": "#24b817" // info
+        "HIGH": "#dc3545", 
+        "MEDIUM": "#fc8211", 
+        "LOW": "#ffc107",  
+        "informational": "#24b817" 
     };
 
 
@@ -77,26 +76,28 @@ function fillTable(data){
             resizable: true,
         },
         pagination: "local",
-        paginationSize: 8,
-        paginationSizeSelector: [8,10,20,30,40,50],
+        paginationSize: 5,
+        paginationSizeSelector: [5,8,10,20,30,40,50],
         movableColumns: true,
         paginationCounter: "rows",
         printAsHtml: true,
         columns: [ //Define Table Columns
             { title: "id", field: "id", width: 50, hozAlign: "center" },
-            { title: "name", field: "name", widthGrow: 2 },
-            { title: "severity", field: "severity", hozAlign: "center", widthGrow: 1,
+            { title: "Issue", field: "name", widthGrow: 3 }, 
+            { title: "severity", field: "severity", hozAlign: "center", widthGrow: 0.5,
                 formatter: function (cell, formatterParams, onRendered) {
                     var severity = cell.getValue();
                     var color = severityColors[severity];
                     cell.getElement().style.color = color;
                     cell.getElement().style.fontWeight = "bold";
                     cell.getElement().style.textTransform = "uppercase";
+                    cell.getElement().style.justifyContent = "center";
+                    cell.getElement().style.alignItems = "center";
                     return severity; // Return the formatted cell value
                 },
                 
             },
-            { title: "location", field: "location", hozAlign: "left", widthGrow: 3 },
+            { title: "location", field: "location", hozAlign: "left", widthGrow: 1 },
         ],
     });
 
@@ -140,10 +141,9 @@ function fillChart(severityCounts){
     var counts = Object.values(severityCounts);
 
     var backgroundColors = [
-        '#dc3545', // critical
-        '#fc8211', // high
-        '#ffc107', // medium
-        '#007bff', // low
+        '#dc3545', // high
+        '#fc8211', // medium
+        '#ffc107', // low
         '#24b817', // info
 
     ];

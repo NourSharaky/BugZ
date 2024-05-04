@@ -20,11 +20,11 @@ if __name__ == "__main__":
       
     # --------------------------- Vulnerability Scanning ---------------------------
 
-    # print(colored("Dependency Scan: ", "red"))
-    # print(parser.dependencyScan())
+    print(colored("Dependency Scan: ", "red"))
+    print(parser.dependencyScan())
 
-    print(colored("Code Scan: ", "red"))
-    print(parser.codeScan())
+    # print(colored("Code Scan: ", "red"))
+    # print(parser.codeScan())
 
 
 

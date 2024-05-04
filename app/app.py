@@ -56,17 +56,21 @@ def dashboard(scanMode="fullScan"):
         if scanMode == "dependencyScan":
             scanOutput = parser.dependencyScan()
             template = 'dependencyScan.html'
+            vulnTable = None
         elif scanMode == "codeScan":
             scanOutput = parser.codeScan()
             template = 'codeScan.html'
+            vulnTable = formatVulnTable(scanOutput)
         elif scanMode == "fullScan":
-            scanOutput = parser.fullScan()
+            DependenciesScanOutput, scanOutput = parser.fullScan()
+            vulnTable = formatVulnTable(scanOutput, DependenciesScanOutput)
             template = 'fullScan.html'
         else:
             scanOutput = None
             template = '404.html'
 
-        return render_template(template,projectPath=projectPath ,projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile, scanOutput=scanOutput)
+        
+        return render_template(template,projectPath=projectPath ,projectName=projectName, pythonFiles=files, requirementsFile=requirementsFile, scanOutput=scanOutput, vulnTable=vulnTable, DependenciesScanOutput=DependenciesScanOutput)
 
 
     else:
@@ -88,55 +92,71 @@ def dashboard(scanMode="fullScan"):
         
         return redirect(url_for('dashboard'))
 
-@app.route("/api/severitySummary")
-def severitySummary():
-    global parser
-    if parser is None:
-        abort(404)
-
-    # Call ImportedLibScan
-
-    # Call FileVulnScan to get the vulnerabilities
+def formatVulnTable(CodeScanOutput, DependencyScanOutput=None):
+    vulnTable = []
+    vulnCounter = 0
     
-    # Build Response JSON
-        # Categorize into the Severity Summary 
+    for file in CodeScanOutput['Files']:
+        if file == "Total Metrics":
+            continue
 
+        for vuln in CodeScanOutput['Files'][file]['results']:
+            vulnCounter += 1
+        
+            if vuln['issue_severity'] == "UNDEFINED":
+                vuln['issue_severity'] = "informational"
 
-# TODO: Implement the severity summary
-    severitySummary = {
-        "critical": 1,
-        "high": 10,
-        "medium": 20,
-        "low": 2,
-        "info": 0
-    }
-    return jsonify(severitySummary)
+            row = {
+                "id": vulnCounter,
+                "severity": vuln['issue_severity'],
+                "name": vuln['issue_text'],
+                "location": file.split(parser.projectFolder)[-1],
+            }
 
-@app.route("/api/vulnerabilitySummary")
-def vulnTable():
-    global parser
-    if parser is None:
-        abort(404)
+            vulnTable.append(row)
+    
+    if DependencyScanOutput:
+        if DependencyScanOutput['Requirements']:
+            for vuln in DependencyScanOutput['Requirements']:
+                vulnCounter += 1
 
-# TODO: Implement the severity summary
-    vulnTable = [
-        {"id": 1, "severity": "critical", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 2, "severity": "critical", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 3, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 4, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 5, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 6, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 7, "severity": "high", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 8, "severity": "medium", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 9, "severity": "medium", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 10, "severity": "low", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 11, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 12, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
-        {"id": 13, "severity": "informational", "name": "SQL Injection", "location": "file1.py"},
-    ]
+                row = {
+                    "id": vulnCounter,
+                    "severity": "LOW",
+                    "name": DependencyScanOutput['Requirements'][vuln]['advisory'],
+                    "location": "requirements.txt",
+                }
 
+                vulnTable.append(row)
+        if DependencyScanOutput['Missing Versions']:
+            for vuln in DependencyScanOutput['Missing Versions']:
+                vulnCounter += 1
 
-    return jsonify(vulnTable)
+                row = {
+                    "id": vulnCounter,
+                    "severity": "informational",
+                    "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
+                    "location": "requirements.txt",
+                }
+
+                vulnTable.append(row)
+        if DependencyScanOutput['Imports']:
+            for file in DependencyScanOutput['Imports']:
+                for vuln in DependencyScanOutput['Imports'][file]:
+                    vulnCounter += 1
+
+                    row = {
+                        "id": vulnCounter,
+                        "severity": "informational",
+                        "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
+                        "location": file.split(parser.projectFolder)[-1],
+                    }
+
+                    vulnTable.append(row)
+        
+    output = jsonify(vulnTable).data
+    
+    return output.decode('utf-8')
 
 
 if __name__ == '__main__':
