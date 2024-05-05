@@ -11,7 +11,7 @@ from classes.AICodeReviewer import AICodeReviewer
 
 class PythonParser:
     # ---------------------------------- Initialization ----------------------------------
-    def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None):
+    def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None, AIEnabled=False):
         """
         Initialize the VulnerabilityScanner class.
 
@@ -48,7 +48,8 @@ class PythonParser:
         self.fullVulnDBFileName = 'db\\insecure_full.json'
         self.fullVulnDB = self.LoadDB(self.fullVulnDBFileName)
         self.logging = logging
-        self.projectFolder = projectFolder    
+        self.projectFolder = projectFolder  
+        self.AIEnabled = AIEnabled
 
     # ---------------------------------- Directory Scanning ----------------------------------
 
@@ -377,6 +378,9 @@ class PythonParser:
             if len(json_out["results"]) < 1 :
                 continue
 
+            # Sorting the results based on severity
+            json_out["results"].sort(key=lambda x: {"HIGH": 1, "MEDIUM": 2, "LOW": 3}.get(x["issue_severity"], 4))
+
             # remove attriutes from json
             for res in json_out["results"]:
                 del res["more_info"]
@@ -389,14 +393,16 @@ class PythonParser:
                 del res["line_range"]
 
                 getRecommendation = {"code": json_out["results"][0]["code"], "issue_text": json_out["results"][0]["issue_text"]}
-                recommendation = self.getAIVulnRecommendation(getRecommendation)
-                res["recommendation"] = recommendation
-                # res["recommendation"] = "Recommendation not available"
+                if self.AIEnabled:
+                    recommendation = self.getAIVulnRecommendation(getRecommendation)
+                    res["recommendation"] = recommendation
+                else:
+                    res["recommendation"] = "Recommendation not available"
 
             output[file] = json_out
         
         output["Total Metrics"] = total_metrics
-        
+        print(output)
         return output
 
     # ---------------------------------- Vulnerability Scanning Modes ----------------------------------

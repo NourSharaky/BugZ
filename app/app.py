@@ -27,7 +27,7 @@ def getTargetFolder():
         projectFolder = None
         abort(404)  # No directory was selected or an error occurred
 
-    parser = PythonParser(logging=False, projectFolder=projectFolder)
+    parser = PythonParser(logging=False, projectFolder=projectFolder, AIEnabled=False)
     return jsonify(projectFolder)
 
 @app.route("/dashboard",methods=['POST','GET'])
@@ -57,10 +57,12 @@ def dashboard(scanMode="fullScan"):
             scanOutput = parser.dependencyScan()
             template = 'dependencyScan.html'
             vulnTable = None
+            DependenciesScanOutput = None
         elif scanMode == "codeScan":
             scanOutput = parser.codeScan()
             template = 'codeScan.html'
             vulnTable = formatVulnTable(scanOutput)
+            DependenciesScanOutput = None
         elif scanMode == "fullScan":
             DependenciesScanOutput, scanOutput = parser.fullScan()
             vulnTable = formatVulnTable(scanOutput, DependenciesScanOutput)
@@ -160,4 +162,4 @@ def formatVulnTable(CodeScanOutput, DependencyScanOutput=None):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)

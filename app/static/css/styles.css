@@ -222,6 +222,7 @@
     background-color: #fffdfd;
     border-radius: 25px;
     box-shadow: 0 0 10px 0 rgba(25, 25, 25, 0.1);
+    box-sizing: border-box;
 }
 
 .vulnLib-section .field {
@@ -248,6 +249,8 @@
 .theme-base16-snazzy{
     border-radius: 5px;
     margin: 0.5em 1.5em;
+    box-sizing: border-box;
+    text-wrap: wrap;
 }
 
 
