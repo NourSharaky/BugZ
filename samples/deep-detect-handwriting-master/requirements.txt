@@ -1,0 +1,6 @@
+streamlit==0.73.1
+streamlit-drawable-canvas==0.5.1
+tensorflow==2.4.0
+scikit-image==0.18.1
+numpy
+pandas
