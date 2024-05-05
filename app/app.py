@@ -27,7 +27,7 @@ def getTargetFolder():
         projectFolder = None
         abort(404)  # No directory was selected or an error occurred
 
-    parser = PythonParser(logging=False, projectFolder=projectFolder, AIEnabled=False)
+    parser = PythonParser(logging=False, projectFolder=projectFolder, AIEnabled=True)
     return jsonify(projectFolder)
 
 @app.route("/dashboard",methods=['POST','GET'])
@@ -118,43 +118,46 @@ def formatVulnTable(CodeScanOutput, DependencyScanOutput=None):
             vulnTable.append(row)
     
     if DependencyScanOutput:
-        if DependencyScanOutput['Requirements']:
-            for vuln in DependencyScanOutput['Requirements']:
-                vulnCounter += 1
-
-                row = {
-                    "id": vulnCounter,
-                    "severity": "LOW",
-                    "name": DependencyScanOutput['Requirements'][vuln]['advisory'],
-                    "location": "requirements.txt",
-                }
-
-                vulnTable.append(row)
-        if DependencyScanOutput['Missing Versions']:
-            for vuln in DependencyScanOutput['Missing Versions']:
-                vulnCounter += 1
-
-                row = {
-                    "id": vulnCounter,
-                    "severity": "informational",
-                    "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
-                    "location": "requirements.txt",
-                }
-
-                vulnTable.append(row)
-        if DependencyScanOutput['Imports']:
-            for file in DependencyScanOutput['Imports']:
-                for vuln in DependencyScanOutput['Imports'][file]:
+        if "Requirements" in DependencyScanOutput.keys():
+            if DependencyScanOutput['Requirements']:
+                for vuln in DependencyScanOutput['Requirements']:
                     vulnCounter += 1
 
                     row = {
                         "id": vulnCounter,
-                        "severity": "informational",
-                        "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
-                        "location": file.split(parser.projectFolder)[-1],
+                        "severity": "LOW",
+                        "name": DependencyScanOutput['Requirements'][vuln]['advisory'],
+                        "location": "requirements.txt",
                     }
 
                     vulnTable.append(row)
+            if  "Missing Versions" in DependencyScanOutput.keys():
+                if DependencyScanOutput['Missing Versions']:
+                    for vuln in DependencyScanOutput['Missing Versions']:
+                        vulnCounter += 1
+
+                        row = {
+                            "id": vulnCounter,
+                            "severity": "informational",
+                            "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
+                            "location": "requirements.txt",
+                        }
+
+                        vulnTable.append(row)
+        if "Imports" in DependencyScanOutput.keys():
+            if DependencyScanOutput['Imports']:
+                for file in DependencyScanOutput['Imports']:
+                    for vuln in DependencyScanOutput['Imports'][file]:
+                        vulnCounter += 1
+
+                        row = {
+                            "id": vulnCounter,
+                            "severity": "informational",
+                            "name": f"The detected {vuln} library has vulnerabilities in certain versions.",
+                            "location": file.split(parser.projectFolder)[-1],
+                        }
+
+                        vulnTable.append(row)
         
     output = jsonify(vulnTable).data
     
@@ -162,4 +165,4 @@ def formatVulnTable(CodeScanOutput, DependencyScanOutput=None):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5005)

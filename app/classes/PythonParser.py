@@ -8,6 +8,8 @@ import subprocess
 from dotenv import load_dotenv
 import os
 from classes.AICodeReviewer import AICodeReviewer
+import threading, queue
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class PythonParser:
     # ---------------------------------- Initialization ----------------------------------
@@ -307,9 +309,12 @@ class PythonParser:
 
         vulnLibs = {}
 
-        requirements = self.requirementsParse(self.targetReqFile)
-        # requirements keys to lower
-        requirements = [req.lower() for req in requirements.keys()]
+        if self.targetReqFile:
+            requirements = self.requirementsParse(self.targetReqFile)
+            # requirements keys to lower
+            requirements = [req.lower() for req in requirements.keys()]
+        else:
+            requirements = []
 
         for importedLib in imports:
             importedLib = importedLib.split(".")[0].lower()
@@ -344,7 +349,7 @@ class PythonParser:
     # Python Files
 
     def pyFilesGeneralScan(self):
-        files , _ = self.scanDirectory()
+        files, _ = self.scanDirectory()
 
         output = {}
         total_metrics = {
@@ -354,53 +359,58 @@ class PythonParser:
             'SEVERITY.UNDEFINED': 0,
         }
 
-        getRecommendation = {}
-
-        for file in files:
-            # Create a Thread for each file and run bandit for that file
-            # Use the bandit API to get the results
-           # Run Bandit using subprocess
-            bandit = subprocess.Popen(["python", "-m", "bandit", "-f", "json", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            # Get output as a single string
+        # Define a function that will be run in each thread
+        def analyze_file(file):
+            bandit = subprocess.Popen(["python", "-m", "bandit", "-f", "json", file],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             json_out = json.loads(bandit.stdout.read().decode())
+            return file, json_out
 
-            file_metrics = json_out['metrics']['_totals']
-           
-            # Sum up the metrics
-            for metric , _ in total_metrics.items():
-                total_metrics[metric] += file_metrics[metric]
-            
-            # remove metrics & errors from json
-            del json_out['metrics']
-            del json_out['errors']
+        # Create a ThreadPoolExecutor to manage threads
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Schedule the analyze_file function to be run for each file
+            future_to_file = {executor.submit(analyze_file, file): file for file in files}
 
-            if len(json_out["results"]) < 1 :
-                continue
+            for future in as_completed(future_to_file):
+                file = future_to_file[future]
+                try:
+                    file, json_out = future.result()
+                    file_metrics = json_out['metrics']['_totals']
 
-            # Sorting the results based on severity
-            json_out["results"].sort(key=lambda x: {"HIGH": 1, "MEDIUM": 2, "LOW": 3}.get(x["issue_severity"], 4))
+                    # Sum up the metrics
+                    for metric in total_metrics:
+                        total_metrics[metric] += file_metrics.get(metric, 0)
 
-            # remove attriutes from json
-            for res in json_out["results"]:
-                del res["more_info"]
-                del res["test_id"] 
-                del res["test_name"]
-                del res["col_offset"]
-                del res["end_col_offset"]
-                del res["issue_confidence"]
-                del res["line_number"]
-                del res["line_range"]
+                    del json_out['metrics']
+                    del json_out['errors']
 
-                getRecommendation = {"code": json_out["results"][0]["code"], "issue_text": json_out["results"][0]["issue_text"]}
-                if self.AIEnabled:
-                    recommendation = self.getAIVulnRecommendation(getRecommendation)
-                    res["recommendation"] = recommendation
-                else:
-                    res["recommendation"] = "Recommendation not available"
+                    if len(json_out["results"]) < 1:
+                        continue
 
-            output[file] = json_out
-        
+                    json_out["results"].sort(key=lambda x: {"HIGH": 1, "MEDIUM": 2, "LOW": 3}.get(x["issue_severity"], 4))
+
+                    for res in json_out["results"]:
+                        del res["more_info"]
+                        del res["test_id"] 
+                        del res["test_name"]
+                        del res["col_offset"]
+                        del res["end_col_offset"]
+                        del res["issue_confidence"]
+                        del res["line_number"]
+                        del res["line_range"]
+
+                        recommendation_data = {"code": res["code"], "issue_text": res["issue_text"]}
+                        if self.AIEnabled:
+                            recommendation = self.getAIVulnRecommendation(recommendation_data)
+                            res["recommendation"] = recommendation
+                        else:
+                            res["recommendation"] = "Recommendation not available"
+
+                    output[file] = json_out
+
+                except Exception as exc:
+                    print(f'File {file} generated an exception: {exc}')
+
         output["Total Metrics"] = total_metrics
         print(output)
         return output
@@ -410,8 +420,9 @@ class PythonParser:
     def dependencyScan(self):
         output = {}
 
-        output["Requirements"] = self.requirementsFileVulnFullScan()
-        _ , output["Missing Versions"] = self.requirementsFileVulnScan()
+        if self.targetReqFile is not None:
+            output["Requirements"] = self.requirementsFileVulnFullScan()
+            _ , output["Missing Versions"] = self.requirementsFileVulnScan()
         output["Imports"] = self.pyFilesImportsScan()
         
         return output
