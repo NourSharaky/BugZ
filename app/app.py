@@ -27,7 +27,7 @@ def getTargetFolder():
         projectFolder = None
         abort(404)  # No directory was selected or an error occurred
 
-    parser = PythonParser(logging=False, projectFolder=projectFolder, AIEnabled=True)
+    parser = PythonParser(logging=False, projectFolder=projectFolder, AIEnabled=False)
     return jsonify(projectFolder)
 
 @app.route("/dashboard",methods=['POST','GET'])
