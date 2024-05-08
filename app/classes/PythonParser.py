@@ -412,7 +412,7 @@ class PythonParser:
                     print(f'File {file} generated an exception: {exc}')
 
         output["Total Metrics"] = total_metrics
-        print(output)
+        # print(output)
         return output
 
     # ---------------------------------- Vulnerability Scanning Modes ----------------------------------
