@@ -2,7 +2,7 @@
 ![Logo](https://github.com/NourSharaky/BugZ/blob/811c441a7afec84da8ddbbd2b1a6407d15fda51d/app/static/images/logo.png)
 
 
-# BugZ SAST: Elevating Secure Software Development
+# Elevating Secure Software Development
 
 BugZ is a state-of-the-art Static Application Security Testing (SAST) tool designed to help developers identify and remediate security vulnerabilities in their codebases. With the increasing complexity of software development and the ever-evolving threat landscape, ensuring the security of dependencies and code is paramount. 
 
