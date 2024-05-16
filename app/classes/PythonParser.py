@@ -1,18 +1,16 @@
-# Used to parse the code and get the syntax tree
 import tree_sitter_python as tspython
-from tree_sitter import Language, Parser
+import json, re, os, subprocess
 from pprint import pprint
 from termcolor import colored
-import json,re,os
-import subprocess
 from dotenv import load_dotenv
-import os
+from tree_sitter import Language, Parser
 from classes.AICodeReviewer import AICodeReviewer
-import threading, queue
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class PythonParser:
+
     # ---------------------------------- Initialization ----------------------------------
+
     def __init__(self, targetFile=None, targetReqFile=None, logging=False, projectFolder=None, AIEnabled=False):
         """
         Initialize the VulnerabilityScanner class.
@@ -59,6 +57,7 @@ class PythonParser:
         """
         Scans the target directory for Python files and requirements.txt file.
         """
+        
         if self.logging:
             print(colored("Target Project Directory: ", "green") + self.projectFolder + "\n----------------------")
         pythonFiles = []
@@ -173,7 +172,6 @@ class PythonParser:
     # ---------------------------------- Vulnerability Scanning ----------------------------------
 
     # Requirements
-
     def LoadDB(self, DBName):
         """
         Load the database from the specified file.
