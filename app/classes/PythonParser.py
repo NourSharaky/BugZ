@@ -1,3 +1,4 @@
+# ---------------------------------- Imports ----------------------------------
 import tree_sitter_python as tspython
 import json, re, os, subprocess
 from pprint import pprint
@@ -36,6 +37,7 @@ class PythonParser:
             projectFolder (str): Path to the project folder.
         """
 
+        # Language & Parser
         self.language = Language(tspython.language(), "python")
         self.targetFile = targetFile
         self.targetReqFile = targetReqFile
@@ -217,7 +219,7 @@ class PythonParser:
         Check if the libraries in the requirements file are vulnerable.
         """
         vulnLibs = {}
-        # Define a regular expression pattern to match the operator and the value
+
         pattern = r'(==|[<>]=?)([0-9a-zA-Z.]+)'
 
         if self.logging:
@@ -402,7 +404,7 @@ class PythonParser:
                             recommendation = self.getAIVulnRecommendation(recommendation_data)
                             res["recommendation"] = recommendation
                         else:
-                            res["recommendation"] = "Recommendation not available"
+                            res["recommendation"] = "Recommendation not available, please set the API key in .env."
 
                     output[file] = json_out
 
@@ -410,7 +412,7 @@ class PythonParser:
                     print(f'File {file} generated an exception: {exc}')
 
         output["Total Metrics"] = total_metrics
-        # print(output)
+
         return output
 
     # ---------------------------------- Vulnerability Scanning Modes ----------------------------------
@@ -459,6 +461,8 @@ class PythonParser:
 
         # Review the code
         return(reviewer.getVulnRecommendation(vulnData))
+    
+
     
 
 
